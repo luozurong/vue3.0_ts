@@ -11,11 +11,18 @@
   <h2>数据监听watch</h2>
   <button @click="watchValue">点击改变单一数据源监听{{num}}</button>
   <button @click="watchObjet">监听对象数据变化</button>
+
+  <h2>组件通信</h2>
+  <child :counts="counts"></child>
 </template>
 <script lang="ts">
-import { defineComponent, onMounted, onUpdated, onUnmounted, reactive, ref, toRefs, watch, getCurrentInstance } from 'vue'
+import { defineComponent, onMounted, onUpdated, onUnmounted, reactive, ref, toRefs, watch, getCurrentInstance, computed } from 'vue'
+import child from './child.vue'
 export default defineComponent({
   name: 'home',
+  components: {
+    child
+  },
   setup () {
     // ref响应式
     const homeName = ref('首页')
@@ -51,6 +58,22 @@ export default defineComponent({
       })
     }
 
+    console.log(toRefs(state))
+
+    // computed
+    const count = ref(1)
+    const plusOne = computed({
+      get: () => count.value + 1,
+      set: val => {
+        count.value = val - 1
+      }
+    })
+
+    plusOne.value = 1
+    console.log(count.value) // 0
+    const num = ref(0)
+    const numPlus = computed(() => num.value + 11)
+    console.log(numPlus.value)
     // 监听单一数据源
     const watchValue = () => {
       state.num += 1
@@ -94,9 +117,12 @@ export default defineComponent({
       console.log('distoryed执行了')
     })
 
+    const counts = ref(111)
+
     return {
       ...toRefs(state),
       homeName,
+      counts,
       handleArray,
       watchValue,
       watchObjet
